@@ -2,3 +2,5 @@
 *.swp
 LEARNING.md
 
+learning/*
+!learning/*.cpp
