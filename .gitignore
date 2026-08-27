@@ -1,7 +1,0 @@
-*.o
-*.swp
-LEARNING.md
-NOTES.md
-
-learning/*
-!learning/*.cpp
