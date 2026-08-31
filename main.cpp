@@ -32,7 +32,7 @@ int main()
     config.sampleRate       = 24000; // 0 for device sample rate
     config.dataCallback     = data_callback; // refill buffer
 	config.periodSizeInFrames = 256; //suggestion, line 6877 in .h
-    config.pUserData        = ;
+    // config.pUserData        = ;
 
     ma_device device;
     if (ma_device_init(NULL, &config, &device) != MA_SUCCESS) {
