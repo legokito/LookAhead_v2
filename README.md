@@ -9,7 +9,7 @@ goal is to use pitch binning (cqt) with HMM/OLTW based approaches (documented in
 this positional information would be used to trigger the half-page turns I need to make this work!
 
 future explorations:
-1. optimize naive cqt
-2. math specifics behind cqt 
+1. optimize naive cqt with parallelism, etc. -> eventually replace with learned model
+2. 
  
 
