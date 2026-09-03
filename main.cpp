@@ -64,6 +64,9 @@ int main()
     //main loop
     ma_device_start(&device);     
 	uint64_t prevCqtCount = rb.getTotalCount();
+	int asciiCounter = 0;
+	std::vector<char> asciiDict = {' ', '.', '*', '#', '@'};
+
 	while (isRunning){
 		while (prevCqtCount + hopSize < rb.getTotalCount()){
 			prevCqtCount += hopSize;
@@ -75,19 +78,29 @@ int main()
 			// cqt			
 			cqt.getMagnitudes(rb_copy, mags);
 
-			// return frequency with most presence
-			int maxFreqI = 0;	
-			float maxFreq = cqt.freq(0);
-			for (size_t i = 0; i < K; i++){
-				if (mags[i] > mags[maxFreqI]){
-					maxFreqI = i;
-					maxFreq = cqt.freq(i);
-				}	
-			}			
-			std::cout << maxFreq;
-			std::cout << " - ";
-			std::cout << mags[maxFreqI];
-			std::cout << "\n";
+			// ascii map
+			if (asciiCounter == 0){
+				for (int i = 1; i < 8; i++){
+					std::cout << "---C--------"; 
+				}
+				std::cout << "\n";
+			}
+
+			if (asciiCounter % 50 == 0){
+				for (int i = 0; i < K; i++){
+					constexpr float STEP = 0.0005f; 
+					int idx = std::min(static_cast<int>(mags[i] / STEP), 4);
+					char asciiChar = asciiDict[idx];	
+					std::cout << asciiChar;
+				}
+				std::cout << "\n";	
+			}
+
+			if (asciiCounter == 1000){
+				asciiCounter = -1;
+			}
+			
+			asciiCounter++;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}    
