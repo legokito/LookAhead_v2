@@ -1,4 +1,5 @@
 #include "miniaudio.h"
+#include "visualizer.h"
 #include "cqt.h"
 #include "ring_buffer.h"
 #include <iostream>
@@ -29,6 +30,8 @@ int main()
 	int B = 12;
 	size_t K = 75;
 	CqtKernels cqt(SR, fMin, B, K);
+
+	Visualizer visualizer(0);
 
 	// must be a power of 2, otherwise we're cooked. 
 	size_t buffer_size = 16384;
@@ -79,27 +82,9 @@ int main()
 			cqt.getMagnitudes(rb_copy, mags);
 
 			// ascii map
-			if (asciiCounter == 0){
-				for (int i = 1; i < 8; i++){
-					std::cout << "---C--------"; 
-				}
-				std::cout << "\n";
-			}
-
 			if (asciiCounter % 50 == 0){
-				for (int i = 0; i < K; i++){
-					constexpr float STEP = 0.0005f; 
-					int idx = std::min(static_cast<int>(mags[i] / STEP), 4);
-					char asciiChar = asciiDict[idx];	
-					std::cout << asciiChar;
-				}
-				std::cout << "\n";	
+				visualizer.drawVisualizer(mags);
 			}
-
-			if (asciiCounter == 1000){
-				asciiCounter = -1;
-			}
-			
 			asciiCounter++;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
