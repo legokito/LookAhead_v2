@@ -26,3 +26,9 @@ future explorations:
 2. build musicXML to WAV from scratch (or rather, musicXML to trackable templates)
  
 
+acknowledgements/references:
+1. oltw paper by dixon
+2. real-time audio programming 101: time waits for nothing by ross bencina
+3. fundamentals of music processing by meinard muller
+4. miniaudio community
+

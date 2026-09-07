@@ -2,6 +2,7 @@
 #include "visualizer.h"
 #include "cqt.h"
 #include "ring_buffer.h"
+#include "featureExtractor.h"
 #include <iostream>
 #include <atomic>
 #include <chrono>
@@ -29,8 +30,8 @@ int main()
 	double fMin = 55.0; // a1
 	int B = 12;
 	size_t K = 75;
-	CqtKernels cqt(SR, fMin, B, K);
 
+	FeatureExtractor featureExtractor(SR, fMin, B, K);
 	Visualizer visualizer(0);
 
 	// must be a power of 2, otherwise we're cooked. 
@@ -39,11 +40,9 @@ int main()
 	
 	// sized to the max amt of frames that a pitch would need to be detected. 
 	// for A1 (55hz) it is 7339 frames, which is what cqt.length(0) is. 
-	std::vector<float> rb_copy(cqt.length(0)); 
+	std::vector<float> rb_copy(featureExtractor.cqt_.length(0)); 
 
 	size_t hopSize = 96;
-	std::vector<float> mags(K);
-	
 
 	// config
     ma_device_config config = ma_device_config_init(ma_device_type_capture);
@@ -68,7 +67,6 @@ int main()
     ma_device_start(&device);     
 	uint64_t prevCqtCount = rb.getTotalCount();
 	int asciiCounter = 0;
-	std::vector<char> asciiDict = {' ', '.', '*', '#', '@'};
 
 	while (isRunning){
 		while (prevCqtCount + hopSize < rb.getTotalCount()){
@@ -79,11 +77,11 @@ int main()
 			if (attempts > 0) continue;			
 
 			// cqt			
-			cqt.getMagnitudes(rb_copy, mags);
+			featureExtractor.processBuffer(rb_copy);
 
 			// ascii map
 			if (asciiCounter % 50 == 0){
-				visualizer.drawVisualizer(mags);
+				visualizer.drawVisualizer(featureExtractor.getFeatures());
 			}
 			asciiCounter++;
 		}
