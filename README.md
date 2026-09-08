@@ -16,6 +16,8 @@ current idea:
 - feed a reference recording (generated from musicXML -> WAV), and build HMM based model to track live audio stream against that reference recording. 
 (if this tracking reliably works, building the infrastructure around is purely an engineering challenge rather than an unknown that blocks this project from working. ).
 
+DONT USE PIECES WITH REPEATS FOR NOW
+
 5. structure to build templates from WAV + midi data
 6. HMM model to track input audio (from computer or live mic) against templates. 
 
@@ -26,9 +28,10 @@ future explorations:
 2. build musicXML to WAV from scratch (or rather, musicXML to trackable templates)
  
 
-acknowledgements/references:
+acknowledgements/references/dependencies:
 1. oltw paper by dixon
 2. real-time audio programming 101: time waits for nothing by ross bencina
-3. fundamentals of music processing by meinard muller
-4. miniaudio community
+3. miniaudio 
+4. https://freepats.zenvoid.org/Piano/acoustic-grand-piano.html piano sound font
+5. pretty\_midi and music21 and fluidsynth
 

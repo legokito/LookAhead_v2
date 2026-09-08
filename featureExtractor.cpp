@@ -14,7 +14,7 @@ void FeatureExtractor::processBuffer(std::span<const float> in){
 	// postprocessing
 }
 
-std::span<float> FeatureExtractor::getFeatures(){	
+std::span<const float> FeatureExtractor::getFeatures(){	
 	return features_;
 }
 

@@ -14,5 +14,5 @@ public:
 	FeatureExtractor(double sr, double fMin, int B, size_t K);
 	
 	void processBuffer(std::span<const float> in);
-	std::span<float> getFeatures();
+	std::span<const float> getFeatures();
 };
