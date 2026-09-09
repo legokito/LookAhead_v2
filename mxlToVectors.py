@@ -56,10 +56,6 @@ pm.write(midi_path)
 
 
 
-
-
-
-
 # midi file to audio vector 
 
 audio = pm.fluidsynth(fs=24000, synthesizer="data_files/piano.sf2")
@@ -77,7 +73,9 @@ measure_indices = np.array(
     dtype=np.int64
 )
 
-downbeats = np.column_stack((measure_indices, downbeat_samples))
+downbeats = np.empty(len(downbeat_samples) * 2, dtype=np.int64)
+downbeats[0::2] = downbeat_samples
+downbeats[1::2] = measure_indices
 downbeats_path = music_xml_path[:-4] + "downbeats.i64"
 
 # write to 'data_files'
