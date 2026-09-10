@@ -1,18 +1,24 @@
 #include "templateGen.h"
-#include <filesystem>
+#include <vector> 
+#include <cstdlib>
+#include <stdexcept>
+#include <string>
+#include <iterator>
+
+
+
 
 TemplateGen::TemplateGen(const std::filesystem::path& musicXmlPath,
-		double SR, size_t mCS, size_t hopsize){
+		double SR, size_t hopsize){
 	
-	basePath = musicXMLPath;
+	basePath = musicXmlPath;
 	basePath.replace_extension();
 
-	mxlPath = musicXMLPath;
-	audioPath = base.string() + "audio.f32";
-	downbeatsPath = base.string() + "downbeats.i64";
+	mxlPath = musicXmlPath;
+	audioPath = basePath.string() + "audio.f32";
+	downbeatsPath = basePath.string() + "downbeats.i64";
 
 	samplingRate = SR;
-	maxCqtSize = mCS;
 	hopSize = hopsize;
 
 
@@ -25,8 +31,8 @@ TemplateGen::TemplateGen(const std::filesystem::path& musicXmlPath,
 	}
 
 	// load data into vectors
-	audio_ = read_vector(audioPath);
-	downbeats_ = read_vector(downbeatsPath);
+	audio_ = read_vector<float>(audioPath);
+	downbeats_ = read_vector<int64_t>(downbeatsPath);
 }
 
 
@@ -36,20 +42,41 @@ std::span<const float> TemplateGen::getAudio() const{
 }
 
 // downbeats is written as (index, measure_no., index, measure_no., ...)
-std::span<const float> TemplateGen::getDownbeats() const{
+std::span<const int64_t> TemplateGen::getDownbeats() const{
 	return downbeats_;
 }
 
-void TemplateGen::loadFeatureTemplate(FeatureExtractor featureExtractor){
-		
+void TemplateGen::loadFeatureTemplate(FeatureExtractor& featureExtractor){
+	int blockSize = featureExtractor.cqt_.length(0);	
+	int K = featureExtractor.getFeaturesSize();
 
+	size_t iterations = (std::ssize(audio_)-blockSize) / hopSize;
+
+	featureTemplate_.resize(iterations * K); 
+
+	for (size_t i = 0; i < iterations; i++){
+		featureExtractor.processBuffer(
+			std::span(audio_).subspan(i * hopSize, blockSize),
+			std::span(featureTemplate_).subspan(i * K, K)
+		);
+
+	}
+
+	//load downbeatFrames with measure indices that correspond to featureTemplate.  
+	
+	downbeatFrames_.resize(downbeats_.size());
+	for (size_t i = 0; i < downbeatFrames_.size(); i++){
+		downbeatFrames_[i] = downbeats_[i] / hopSize;	
+	}
 }
 
-std::span<std::span<const float>> TemplateGen::getFeatureTemplate() const{
+std::span<const float> TemplateGen::getFeatureTemplate() const {
 	return featureTemplate_;
 }
 
-
+std::span<const int64_t> TemplateGen::getDownbeatFrames() const {
+	return downbeatFrames_;
+}
 
 
 

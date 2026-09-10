@@ -10,7 +10,7 @@ Visualizer::Visualizer(int count){
 }
 
 void Visualizer::drawVisualizer(std::span<const float> mags){
-             if (asciiCounter % 30 == 0){
+             if (asciiCounter % 24 == 0){
                  for (int i = 1; i < 8; i++){
                      std::cout << "---C--------";
                  }
