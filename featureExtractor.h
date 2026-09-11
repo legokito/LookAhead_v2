@@ -8,6 +8,7 @@
 class FeatureExtractor{
 private: 
 	std::vector<float> features_;
+	std::vector<float> in_;
 
 public:
 	CqtKernels cqt_;

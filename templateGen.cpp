@@ -64,8 +64,8 @@ void TemplateGen::loadFeatureTemplate(FeatureExtractor& featureExtractor){
 
 	//load downbeatFrames with measure indices that correspond to featureTemplate.  
 	
-	downbeatFrames_.resize(downbeats_.size());
-	for (size_t i = 0; i < downbeatFrames_.size(); i++){
+	downbeatFrames_ = downbeats_;
+	for (size_t i = 0; i < downbeatFrames_.size(); i+=2){
 		downbeatFrames_[i] = downbeats_[i] / hopSize;	
 	}
 }

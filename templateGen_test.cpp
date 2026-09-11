@@ -12,6 +12,8 @@ int main(int argc, char* argv[]){
 
 	templateGen.loadFeatureTemplate(featureExtractor);
 	int sizeOfDownbeats = templateGen.getDownbeatFrames().size();
+	
+	std::cout << sizeOfDownbeats << std::endl;
 
 	for (int i = 0; i < sizeOfDownbeats; i += 2){
 		visualizer.drawVisualizer(

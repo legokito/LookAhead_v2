@@ -73,6 +73,10 @@ measure_indices = np.array(
     dtype=np.int64
 )
 
+# downbeats are offset by anacrusis. i.e. in a 4/4 piece, if there is 2 beat anacrusis, then the start of piece
+# is the first downbeat, and then each downbeat is offset by 2 beats. 
+# could be due to xml to midi conversion, or prettymidi itself, but its a problem for later cause tracking 
+# should still work. 
 downbeats = np.empty(len(downbeat_samples) * 2, dtype=np.int64)
 downbeats[0::2] = downbeat_samples
 downbeats[1::2] = measure_indices
@@ -86,3 +90,4 @@ downbeats.tofile(downbeats_path)
 # for debugging/listening purposes
 import soundfile as sf
 sf.write("data_files/test.wav", audio, 24000)
+

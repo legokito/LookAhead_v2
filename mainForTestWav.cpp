@@ -12,18 +12,32 @@
 #include <thread>
 #include <cmath>
 
+std::atomic<bool> isRunning(true);
+
+struct Ctx {
+      RingBuffer* rb;
+      ma_decoder* dec;
+};
+
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
-	// pInput is simply a memory address with sequential values    
-	// pInput size = frameCount * bytesPerSample (4 for us)
+      // playback mode: pInput is NULL. pull from decoder into pOutput,
+      // then copy that same data into the ring buffer for analysis.
+      (void)pInput;
 
-	auto* rb = static_cast<RingBuffer*>(pDevice->pUserData);
-	auto newSamples = static_cast<const float*>(pInput);
-	std::span<const float> in(newSamples, frameCount);
-	rb->addSamples(in, frameCount);
+      auto* ctx = static_cast<Ctx*>(pDevice->pUserData);
+      auto* out = static_cast<float*>(pOutput);
+
+      ma_uint64 read = 0;
+      ma_decoder_read_pcm_frames(ctx->dec, out, frameCount, &read);
+
+      for (ma_uint64 i = read; i < frameCount; i++) out[i] = 0.0f;
+
+      ctx->rb->addSamples({out, static_cast<size_t>(read)}, static_cast<size_t>(read));
+
+      if (read < frameCount) isRunning = false;   // EOF
 }
 
-std::atomic<bool> isRunning(true);
 
 int main(int args, char* argv[])
 {
@@ -54,18 +68,31 @@ int main(int args, char* argv[])
 	std::vector<float> features_(K);
 
 
-	// config
-    ma_device_config config = ma_device_config_init(ma_device_type_capture);
-    config.capture.format   = ma_format_f32;   
-    config.capture.channels = 1;               
-    config.sampleRate       = SR; // 0 for device sample rate
-	config.dataCallback      = data_callback;
-    config.pUserData        = &rb;
 
-    ma_device device;
-    if (ma_device_init(NULL, &config, &device) != MA_SUCCESS) {
-        return -1;  // Failed to initialize the device.
-    }
+	// decoder: resamples/downmixes whatever the wav is into 24kHz mono f32
+	ma_decoder_config dcfg = ma_decoder_config_init(ma_format_f32, 1, 24000);
+	ma_decoder decoder;
+	if (ma_decoder_init_file(argv[2], &dcfg, &decoder) != MA_SUCCESS) {
+			std::cerr << "cannot open wav: " << argv[2] << "\n";
+			return 1;
+	}
+
+	Ctx ctx{&rb, &decoder};
+
+	// playback, because audio comes from the file not the mic
+	ma_device_config config = ma_device_config_init(ma_device_type_playback);
+	config.playback.format   = ma_format_f32;
+	config.playback.channels = 1;
+	config.sampleRate        = static_cast<ma_uint32>(SR);
+	config.dataCallback      = data_callback;
+	config.pUserData         = &ctx;
+
+	ma_device device;
+	if (ma_device_init(NULL, &config, &device) != MA_SUCCESS) {
+			ma_decoder_uninit(&decoder);
+			std::cerr << "failed to init device\n";
+			return 1;
+	}
 
 
 	// for aborting
@@ -101,6 +128,7 @@ int main(int args, char* argv[])
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}    
     ma_device_uninit(&device);
+	ma_decoder_uninit(&decoder);
 
 
 	std::cout << "done!\n";
