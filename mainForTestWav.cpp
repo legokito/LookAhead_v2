@@ -104,25 +104,20 @@ int main(int args, char* argv[])
 	uint64_t prevCqtCount = rb.getTotalCount();
 
 	int measureNo_ = 1;
-	int counter = 0;	
 
 	while (isRunning){
 		while (prevCqtCount + hopSize < rb.getTotalCount()){
-			prevCqtCount += hopSize;
 
 			// copy rb. check for tearing.
 			int attempts = rb.copyRingBuffer(rb_copy, rb_copy.size()); 
 			if (attempts > 0) continue;			
 
+			prevCqtCount += hopSize;
 			// cqt			
 			featureExtractor.processBuffer(rb_copy, features_);
 			measureNo_ = hmm.updateModel(features_);
-			if (counter % 25 == 0){
-				counter = 0;  
-				std::cout << measureNo_ << std::endl;
-			}
+			std::cout << measureNo_ << std::endl;
 
-			counter++;
 			
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));

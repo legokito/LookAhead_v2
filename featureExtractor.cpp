@@ -8,22 +8,25 @@ FeatureExtractor::FeatureExtractor(double sr, double fMin, int B, size_t K) : cq
 }
 
 void FeatureExtractor::processBuffer(std::span<const float> in, std::span<float> out){
-	in_.resize(in.size());
 	
+	out_.resize(out.size());
+
+	// cqt
+	cqt_.getMagnitudes(in, out_);
+
 	// l2 norm
 	float sum = 0;
-	for (int i = 0; i < in.size(); i++){
-		in_[i] = in[i];
-		sum += in[i] * in[i];
+	for (int i = 0; i < out.size(); i++){
+		out[i] = out_[i];
+		sum += out_[i] * out_[i];
 	}
 	
 	float sqrt = std::sqrt(sum);
-	for (int i = 0; i < in.size(); i++){
-		in_[i] /= sqrt;
+	for (int i = 0; i < out.size(); i++){
+		if (sqrt == 0) out[i] = 0;
+		else out[i] /= sqrt;
 	}
 
-	// cqt
-	cqt_.getMagnitudes(in_, out);
 
 	// postprocessing - make out_ for it
 }

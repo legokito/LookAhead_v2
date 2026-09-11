@@ -81,12 +81,12 @@ int main(int args, char* argv[])
 
 	while (isRunning){
 		while (prevCqtCount + hopSize < rb.getTotalCount()){
-			prevCqtCount += hopSize;
 
 			// copy rb. check for tearing.
 			int attempts = rb.copyRingBuffer(rb_copy, rb_copy.size()); 
 			if (attempts > 0) continue;			
 
+			prevCqtCount += hopSize;
 			// cqt			
 			featureExtractor.processBuffer(rb_copy, features_);
 			measureNo_ = hmm.updateModel(features_);

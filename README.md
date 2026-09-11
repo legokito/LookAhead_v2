@@ -13,8 +13,15 @@ engine will be written from scratch. musicXML parsing and rendering will be done
 4. ~~visualizer for pitch bins (good for quick reference)~~
 5. ~~structure to build 24khz audio sample vector from xml file (use python libs)~~
 6. ~~build template from audio sample vector and testttt~~
-7. HMM model to track input audio (from computer or live mic) against templates. 
+7. ~~HMM model to track input audio (from computer or live mic) against templates.~~
+8. understand which parameters bring about robustness, try quantifying how model behaves with changes in parameters rather than just intuiting it
+9. put together the UI.
 
+IT WORKSSKSKSKSJSKFJSKJFSKJ
+
+methods of hmm are still fairly naive and ofc tuning and improvements are to be made for robustness, polish, blah, blah 
+
+but generally it tracks my current measure while playing chopin op 9 no 1 fairly reliablyyy
 
 # notes:
 - i'm starting to see why naming conventions, and clear architecture drawings are needed to maintain and use clean code lol

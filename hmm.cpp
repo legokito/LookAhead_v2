@@ -10,7 +10,7 @@ HMM::HMM(std::span<const float> templateFrames, std::span<const int64_t> downbea
 	//downbeatFrames_ = downbeatFrames;
 
 	sparseTransition_ = {std::log(0.1f), std::log(0.45f), 
-		std::log(0.25f), std::log(0.15f), std::log(0.05f)}; 
+		std::log(0.125f), std::log(0.05f), std::log(0.0125f)}; 
 
 	K_ = K;
 	T = templateFrames_.size() / K;
