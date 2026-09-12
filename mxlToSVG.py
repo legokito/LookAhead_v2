@@ -19,7 +19,7 @@ tk.setOptions({
     "scale": 40,
 
     "pageWidth": 2400,
-    "pageHeight": 1300,
+    "pageHeight": 1350,
 
     "pageMarginTop": 20,
     "pageMarginBottom": 20,
@@ -27,7 +27,6 @@ tk.setOptions({
     "pageMarginRight": 20,
 
     "spacingStaff": 1,
-    "adjustPageHeight": True,
 
     "svgViewBox": True,
     "expand": "always",

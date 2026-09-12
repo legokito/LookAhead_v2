@@ -1,11 +1,16 @@
 import json
 import webview
+import threading
+import time
 
 
 class SheetMusicViewer:
     def __init__(self):
         self.current_measure = None
         self.pages = []
+
+        self.thresholds = []
+        self.cur_threshold_index = None
 
         self.top_segment = None
         self.bottom_segment = None
@@ -53,6 +58,42 @@ class SheetMusicViewer:
             """
         )
 
+    def compute_thresholds(self):
+        for page in self.pages:
+            start = int(page["startMeasure"])
+            end = int(page["endMeasure"])
+
+            self.thresholds.append((start + end) / 2)
+
+        self.cur_threshold_index = 1
+
+
+
+def main_loop(viewer):
+
+    while True:
+        viewer.current_measure = viewer.read_measure_no()
+
+        if viewer.current_measure is None:
+            time.sleep(0.05)
+            continue
+
+        if (viewer.cur_threshold_index < len(viewer.pages) and 
+            viewer.current_measure > viewer.thresholds[viewer.cur_threshold_index]
+        ):
+            viewer.cur_threshold_index += 1
+
+            if viewer.cur_threshold_index >= len(viewer.pages):
+                continue
+
+            if (viewer.cur_threshold_index % 2 == 0):
+                viewer.top_segment = viewer.pages[viewer.cur_threshold_index]["svg"]
+            else:
+                viewer.bottom_segment = viewer.pages[viewer.cur_threshold_index]["svg"]
+
+            viewer.update_webview()    
+
+        time.sleep(0.05)
 
 def main():
     viewer = SheetMusicViewer()
@@ -71,6 +112,16 @@ def main():
         height=800,
         resizable=True
     )
+
+    viewer.compute_thresholds()
+
+    loop_thread = threading.Thread(
+        target=main_loop,
+        args=(viewer,),
+        daemon=True
+    )
+    loop_thread.start()
+
 
     webview.start(viewer.update_webview)
 

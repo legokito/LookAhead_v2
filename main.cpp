@@ -11,6 +11,8 @@
 #include <csignal>
 #include <thread>
 #include <cmath>
+#include <fstream>
+#include <cstdio>
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
 {
@@ -69,7 +71,13 @@ int main(int args, char* argv[])
 
 
 	// for aborting
-	std::signal(SIGINT, [](int) { isRunning = false; });  
+	std::signal(SIGINT, [](int) { 
+		std::ofstream f("measureNo.tmp", std::ios::trunc);
+		f << 1 << "\n";
+		f.close();
+		std::rename("measureNo.tmp", "measureNo.txt"); //rename is atomic :)
+		isRunning = false; 
+	});  
 	std::cout << "ctrl + c to stop\n";
 
     //main loop
@@ -77,7 +85,7 @@ int main(int args, char* argv[])
 	uint64_t prevCqtCount = rb.getTotalCount();
 
 	int measureNo_ = 1;
-	int counter = 0;	
+	int lastWritten = -1;
 
 	while (isRunning){
 		while (prevCqtCount + hopSize < rb.getTotalCount()){
@@ -87,15 +95,21 @@ int main(int args, char* argv[])
 			if (attempts > 0) continue;			
 
 			prevCqtCount += hopSize;
+
 			// cqt			
 			featureExtractor.processBuffer(rb_copy, features_);
 			measureNo_ = hmm.updateModel(features_);
-			if (counter % 25 == 0){
-				counter = 0;  
+
+			if (measureNo_ != lastWritten){
+				std::ofstream f("measureNo.tmp", std::ios::trunc);
+				f << measureNo_ << "\n";
+				f.close();
+				std::rename("measureNo.tmp", "measureNo.txt"); //rename is atomic :)
+				lastWritten = measureNo_;
+
 				std::cout << measureNo_ << std::endl;
 			}
 
-			counter++;
 			
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
