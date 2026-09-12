@@ -1,7 +1,7 @@
 #ifndef MINIAUDIO_IMPLEMENTATION
 #define MINIAUDIO_IMPLEMENTATION
 
-#include "miniaudio.h"
+#include "third_party/miniaudio.h"
 
 #endif
 

@@ -1,10 +1,10 @@
-#include "miniaudio.h"
-#include "visualizer.h"
-#include "cqt.h"
-#include "ring_buffer.h"
-#include "featureExtractor.h"
-#include "templateGen.h"
-#include "hmm.h"
+#include "third_party/miniaudio.h"
+#include "headers/visualizer.h"
+#include "headers/cqt.h"
+#include "headers/ring_buffer.h"
+#include "headers/featureExtractor.h"
+#include "headers/templateGen.h"
+#include "headers/hmm.h"
 #include <iostream>
 #include <atomic>
 #include <chrono>

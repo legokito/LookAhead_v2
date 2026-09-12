@@ -1,6 +1,6 @@
-#include "templateGen.h"
-#include "visualizer.h"
-#include "featureExtractor.h"
+#include "../headers/templateGen.h"
+#include "../headers/visualizer.h"
+#include "../headers/featureExtractor.h"
 
 int main(int argc, char* argv[]){
 

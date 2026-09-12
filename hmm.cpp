@@ -1,4 +1,4 @@
-#include "hmm.h"
+#include "headers/hmm.h"
 #include <cmath>
 #include <numeric>
 #include <utility>

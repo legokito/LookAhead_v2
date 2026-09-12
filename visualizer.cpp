@@ -1,4 +1,4 @@
-#include "visualizer.h"
+#include "headers/visualizer.h"
 #include <iostream>
 #include <cstddef>
 #include <span>
